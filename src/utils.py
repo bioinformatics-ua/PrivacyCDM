@@ -7,5 +7,3 @@ def readFields():
 		data = line.split(",")
 		if len(data) > 2:
 			print(data[0],data[1])
-
-readFields()
