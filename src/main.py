@@ -3,13 +3,20 @@ import configparser
 from pprint import pprint
 from utils import *
 from attributes import *
+from core import PluginEngine
+from config import pluginsPath
 
 def help(show=False):
 	parser = argparse.ArgumentParser(description="")
-	configs = parser.add_argument_group('Core features', 'This tool aims to measure the privacy levels in released data from the OMOP CDM structure')
-	#configs.add_argument('-s', '--settings', dest='settings', \
+	core = parser.add_argument_group('Core features', 'This tool aims to measure the privacy levels in released data from the OMOP CDM structure')
+	#core.add_argument('-s', '--settings', dest='settings', \
 	#					type=str, default="settings.ini", \
 	#					help='The system settings file (default: settings.ini)')	
+	core.add_argument('-ka', '--k-anonymity', default=False, action='store_true', \
+						 help='It loads the k-anonymity plugin into the core (default: False)')
+	core.add_argument('-ld', '--l-diversity', default=False, action='store_true', \
+						 help='It loads the l-diversity plugin into the core (default: False)')
+	############################################
 	aux_methods = parser.add_argument_group('Auxiliary methods', 'Methods useful during the development of this tool that may not be necessary for the last version.')
 	aux_methods.add_argument('-rf', '--read-fields', default=False, action='store_true', \
 						 help='When active, it reads the OMOP CDM CSV file with all fields and print them (default: False)')
@@ -37,7 +44,16 @@ def readSettings(settingsFile):
 	return configuration
 
 def coreMethods(args):
-	pass
+	options = {
+		"plugins": dict(),
+		"directory": pluginsPath
+	}
+	if args.k_anonymity:
+		options["plugins"]["k-Anonymity"] = True
+	if args.l_diversity:
+		options["plugins"]["l-Diversity"] = True
+	PluginEngine(options=options).start()
+
 
 def auxMethods(args):	
 	if args.read_fields:
