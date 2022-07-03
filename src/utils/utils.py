@@ -1,6 +1,16 @@
-from config import cdmSchemaPath
+import os
+from config import cdmSchemaPath, pluginsPath
+from typing import List, Dict, Union, Optional
+import yaml
 
-def readFields():
+__IGNORE_LIST = ['__pycache__', '__init__.py']
+def __filterUnwantedDirectories(name: str) -> bool:
+    return not __IGNORE_LIST.__contains__(name)
+
+def filterPluginsPaths(pluginsPackage) -> List[str]:
+    return list(filter(__filterUnwantedDirectories, os.listdir(pluginsPackage)))
+
+def readFields() -> None:
 	with open(cdmSchemaPath, 'r') as f:
 		lines = f.readlines()
 	for line in lines:
@@ -8,7 +18,7 @@ def readFields():
 		if len(data) > 2:
 			print(data[0],data[1])
 
-def processAttributes(listOfAttributes):
+def processAttributes(listOfAttributes: list) -> dict:
 	dictOfAttributes = {}
 	for table, field in listOfAttributes:
 		table = table.lower()
@@ -17,7 +27,7 @@ def processAttributes(listOfAttributes):
 		dictOfAttributes[table].append(field.lower())
 	return dictOfAttributes
 
-def attibutesToLatexTable(dictOfAttributes):
+def attibutesToLatexTable(dictOfAttributes: dict) -> None:
 	for table in dictOfAttributes:
 		tableToPrint = table.replace("_", "\\_")
 		print("\t" + tableToPrint, end = ' & ')
@@ -26,6 +36,6 @@ def attibutesToLatexTable(dictOfAttributes):
 			tableFields += field
 			tableFields += ", "
 		tableFields = tableFields[:-2]
-		tableFields += " \\\\  \\hline"
+		tableFields += " \\\\  \git \hline"
 		tableFields = tableFields.replace("_", "\\_")
 		print(tableFields)
