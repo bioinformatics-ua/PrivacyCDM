@@ -1,5 +1,7 @@
 import os
 from config import cdmSchemaPath, pluginsPath
+from utils import FileSystem, PluginConfig
+from dacite import from_dict
 from typing import List, Dict, Union, Optional
 import yaml
 
@@ -10,6 +12,17 @@ def __filterUnwantedDirectories(name: str) -> bool:
 def filterPluginsPaths(pluginsPackage) -> List[str]:
     return list(filter(__filterUnwantedDirectories, os.listdir(pluginsPackage)))
 
+def readConfiguration(modulePath) -> Optional[PluginConfig]:
+	try:
+		pluginConfigData = FileSystem.loadConfiguration('plugin.yaml', modulePath)
+		pluginConfig = from_dict(data_class=PluginConfig, data=pluginConfigData)
+		return pluginConfig
+	except FileNotFoundError as e:
+		print('Unable to read configuration file', e)
+	except (NameError) as e:
+		print('Unable to parse plugin configuration to data class', e)
+	return None
+		
 def readFields() -> None:
 	with open(cdmSchemaPath, 'r') as f:
 		lines = f.readlines()
