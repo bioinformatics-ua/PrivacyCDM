@@ -2,7 +2,7 @@ from core import PluginCore
 import pandas as pd
 from attributes import keyAttributes, sensitiveAttributes, quasiIdentifiers
 from utils import utils
-from plugins.sharedMethods import dropColumns, generalisationOperations, suppressionOperations
+from plugins.sharedMethods import dropColumns, generalisationOperations, suppressionOperations, getAvailableQuasiIdentifiers, validateClassifications, getEquivalenceClasses
 import config
 
 class Kanonymity(PluginCore):
@@ -22,33 +22,23 @@ class Kanonymity(PluginCore):
         dataTmp = data
         dataTmp = dataTmp.drop(columns=utils.getListOfAttributes(sensitiveAttributes), errors='ignore')
         
-        availableQuasiIdentifiers = []
-        for attr in utils.getListOfAttributes(quasiIdentifiers):
-            if attr in list(dataTmp):
-                availableQuasiIdentifiers.append(attr)
+        availableQuasiIdentifiers = getAvailableQuasiIdentifiers(dataTmp)
 
         dataToGroup = dataTmp
-        emptyData = dataTmp.drop(columns=availableQuasiIdentifiers)
-        if not emptyData.empty:
-            print("Some attributes are not classified!")
-            print(emptyData)
-            exit(0)
+        validateClassifications(dataTmp, availableQuasiIdentifiers)
 
-        counter = {}
-        for entry in dataToGroup.values.tolist():
-            entry = str(entry)
-            if entry not in counter:
-                counter[entry] = 0
-            counter[entry] += 1
-
+        equivalenceClasses = getEquivalenceClasses(dataToGroup)
+        
+        return self.__removeEntries(equivalenceClasses, dataToGroup, data, k)
+        
+    def __removeEntries(self, equivalenceClasses: dict, dataToGroup: pd.DataFrame, data: pd.DataFrame, k:int) -> pd.DataFrame:
         indexToRemove = list()
         index = 0
         for entry in dataToGroup.values.tolist():
             entry = str(entry)
-            if counter[entry] < k:
+            if equivalenceClasses[entry] < k:
                 indexToRemove.append(index)
             index += 1
-
         for index, row in data.iterrows():
             if index in indexToRemove:
                 data.drop(index, inplace=True)
