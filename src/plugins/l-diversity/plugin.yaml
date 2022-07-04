@@ -1,0 +1,6 @@
+name: 'l-Diversity'
+creator: 'Joao Almeida'
+runtime:
+  main: 'ldiversity.py'
+description: 'Plugin to apply l-Diversity model to a data set'
+version: '0.0.1'

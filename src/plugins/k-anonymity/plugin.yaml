@@ -1,0 +1,6 @@
+name: 'k-Anonymity'
+creator: 'Joao Almeida'
+runtime:
+  main: 'kanonymity.py'
+description: 'Plugin to apply k-anonymity model to a data set'
+version: '0.0.1'
