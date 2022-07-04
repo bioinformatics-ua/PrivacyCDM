@@ -4,18 +4,21 @@ from pprint import pprint
 from utils import *
 from attributes import *
 from core import PluginEngine
-from config import pluginsPath
+import config
 
 def help(show=False):
 	parser = argparse.ArgumentParser(description="")
-	core = parser.add_argument_group('Core features', 'This tool aims to measure the privacy levels in released data from the OMOP CDM structure')
-	#core.add_argument('-s', '--settings', dest='settings', \
-	#					type=str, default="settings.ini", \
-	#					help='The system settings file (default: settings.ini)')	
+	core = parser.add_argument_group('Core features', 'This tool aims to measure the privacy levels in released data from the OMOP CDM structure')	
 	core.add_argument('-ka', '--k-anonymity', default=False, action='store_true', \
 						 help='It loads the k-anonymity plugin into the core (default: False)')
+	core.add_argument('-k', '--k-value', dest='k_value', type=int, default=10, \
+						help='The value of K (defaul: 10')	
 	core.add_argument('-ld', '--l-diversity', default=False, action='store_true', \
 						 help='It loads the l-diversity plugin into the core (default: False)')
+	core.add_argument('-dl', '--data-location', dest='data_location', type=str, default="", \
+						help='The location of the dataset to be armonised')			
+	core.add_argument('-el', '--export-location', dest='export_location', type=str, default="../results/", \
+						help='The location to write the armonised dataset (defaul: ../results/')					 
 	############################################
 	aux_methods = parser.add_argument_group('Auxiliary methods', 'Methods useful during the development of this tool that may not be necessary for the last version.')
 	aux_methods.add_argument('-rf', '--read-fields', default=False, action='store_true', \
@@ -36,23 +39,26 @@ def help(show=False):
 		parser.print_help()
 	return parser.parse_args()
 
-def readSettings(settingsFile):
-	configuration = configparser.ConfigParser()
-	configuration.read(settingsFile)
-	if not configuration:
-		raise Exception("The settings file was not found!")
-	return configuration
-
 def coreMethods(args):
-	options = {
-		"plugins": dict(),
-		"directory": pluginsPath
-	}
-	if args.k_anonymity:
-		options["plugins"]["k-Anonymity"] = True
-	if args.l_diversity:
-		options["plugins"]["l-Diversity"] = True
-	PluginEngine(options=options).start()
+	if args.k_anonymity or args.l_diversity:
+		if len(args.data_location) == 0:
+			print("Error: The location of dataset was not defined!")
+			help(True)
+			exit(0)
+			
+		options = {
+			"plugins": dict(),
+			"directory": config.pluginsPath,
+			"dataLocation": args.data_location,
+			"delimiter": ",",
+			"exportLocation": args.export_location
+		}
+		if args.k_anonymity:
+			options["plugins"]["k-Anonymity"] = True
+			config.k_anonymity = args.k_value
+		if args.l_diversity:
+			options["plugins"]["l-Diversity"] = True
+		PluginEngine(options=options).start()
 
 
 def auxMethods(args):	
@@ -77,11 +83,10 @@ def auxMethods(args):
 		
 	if args.latex_attributes_sensitive:
 		print(attibutesToLatexTable(processAttributes(quasiIdentifiers)))
-		
+
 
 def main():
 	args = help()
-	#settings = readSettings(args.settings)
 	coreMethods(args)
 	auxMethods(args)
 

@@ -1,5 +1,5 @@
 from core import Registry
-import string
+import pandas as pd
 
 class PluginCore(object, metaclass=Registry):
     def __init__(self, position: int) -> None:
@@ -8,5 +8,5 @@ class PluginCore(object, metaclass=Registry):
     def getPosition(self) -> int:
         return self.position
         
-    def invoke(self, **args) -> string:
+    def invoke(self, **args) -> pd.DataFrame:
         pass

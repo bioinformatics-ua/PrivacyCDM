@@ -1,1 +1,1 @@
-from .attibutes import *
+from .attributes import *

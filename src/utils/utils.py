@@ -5,7 +5,7 @@ from dacite import from_dict
 from typing import List, Dict, Union, Optional
 import yaml
 
-__IGNORE_LIST = ['__pycache__', '__init__.py']
+__IGNORE_LIST = ['__pycache__', '__init__.py', 'sharedMethods.py']
 def __filterUnwantedDirectories(name: str) -> bool:
     return not __IGNORE_LIST.__contains__(name)
 
@@ -52,3 +52,18 @@ def attibutesToLatexTable(dictOfAttributes: dict) -> None:
 		tableFields += " \\\\  \git \hline"
 		tableFields = tableFields.replace("_", "\\_")
 		print(tableFields)
+
+def getListOfAttributes(listOfAttributes: list) -> list:
+	newListOfAttributes = set()
+	for table, field in listOfAttributes:
+		newListOfAttributes.add(field) 
+	return list(newListOfAttributes)
+
+def get_spans(df, partition, scale=None):
+    spans = {}
+    for column in df.columns:
+        span = len(df[column][partition].unique())
+        if scale is not None:
+            span = span/scale[column]
+        spans[column] = span
+    return spans
