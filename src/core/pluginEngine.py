@@ -17,8 +17,10 @@ class PluginEngine:
 
     def __invokePlugins(self) -> None:
         data = DataManager.loadData(self.dataLocation, self.delimiter)
+        tags = ""
         for module in self.actions.modules:
             plugin = self.actions.register(module)
             anonimiser = self.actions.hook(plugin)
-            data = anonimiser(data=data)
-        DataManager.exportData(data, self.exportLocation, self.dataLocation, self.delimiter)
+            data, tag = anonimiser(data=data)
+            tags += tag + "_"
+        DataManager.exportData(data, self.exportLocation, tags, self.dataLocation, self.delimiter)

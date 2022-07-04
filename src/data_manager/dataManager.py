@@ -8,6 +8,6 @@ class DataManager:
         return data
 
     @staticmethod
-    def exportData(data: pd.DataFrame, location: str, source: str, delimiter: str) -> None:
-        name = "anonymised_" + source.split("/")[-1]
+    def exportData(data: pd.DataFrame, location: str, tags: str, source: str, delimiter: str) -> None:
+        name = "anonymised_" + tags + source.split("/")[-1]
         data.to_csv(path.join(location, name), sep=delimiter)

@@ -15,6 +15,8 @@ def help(show=False):
 						help='The value of K (defaul: 10')	
 	core.add_argument('-ld', '--l-diversity', default=False, action='store_true', \
 						 help='It loads the l-diversity plugin into the core (default: False)')
+	core.add_argument('-l', '--l-value', dest='l_value', type=int, default=5, \
+						help='The value of L (defaul: 5')	
 	core.add_argument('-dl', '--data-location', dest='data_location', type=str, default="", \
 						help='The location of the dataset to be armonised')			
 	core.add_argument('-el', '--export-location', dest='export_location', type=str, default="../results/", \
@@ -39,6 +41,7 @@ def help(show=False):
 		parser.print_help()
 	return parser.parse_args()
 
+
 def coreMethods(args):
 	if args.k_anonymity or args.l_diversity:
 		if len(args.data_location) == 0:
@@ -58,6 +61,7 @@ def coreMethods(args):
 			config.k_anonymity = args.k_value
 		if args.l_diversity:
 			options["plugins"]["l-Diversity"] = True
+			config.l_diversity = args.l_value
 		PluginEngine(options=options).start()
 
 

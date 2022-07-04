@@ -253,5 +253,7 @@ quasiIdentifiers = [
     ("MEASUREMENT","provider_id"),
     ("DEVICE_EXPOSURE","provider_id"),
     ("PROCEDURE_OCCURRENCE","provider_id"),
-    ("DRUG_EXPOSURE","provider_id")
+    ("DRUG_EXPOSURE","provider_id"),
+    ("COHORT_ROWS","start_date"),
+    ("COHORT_ROWS","end_date")
 ]
