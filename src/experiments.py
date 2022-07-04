@@ -2,7 +2,7 @@ import os
 import csv
 from pprint import pprint
 
-
+RUN=False
 dataLocation = "../cohorts/data"
 original = dict()
 anonymised = dict()
@@ -19,7 +19,8 @@ for k in [2, 3, 4, 5]:
                 "rows": len(content)-1
             }
 
-            os.system(f"python3 main.py -dl {dataLocation}/{file} -ka -k {k} -el ../results/k_anonymity/")
+            if RUN:
+                os.system(f"python3 main.py -dl {dataLocation}/{file} -ka -k {k} -el ../results/k_anonymity/")
 
     for (dirpath, dirnames, filenames) in os.walk("../results/k_anonymity/"):
         for file in filenames:
@@ -67,7 +68,8 @@ for l in [2, 3, 4, 5]:
                 "rows": len(content)-1
             }
 
-            os.system(f"python3 main.py -dl {dataLocation}/{file} -ld -l {l} -el ../results/l_diversity/")
+            if RUN:
+                os.system(f"python3 main.py -dl {dataLocation}/{file} -ld -l {l} -el ../results/l_diversity/")
 
     for (dirpath, dirnames, filenames) in os.walk("../results/l_diversity/"):
         for file in filenames:
@@ -115,11 +117,12 @@ for k in [2, 3]:
                     "rows": len(content)-1
                 }
 
-                os.system(f"python3 main.py -dl {dataLocation}/{file} -ka -k {k} -ld -l {l} -el ../results/both/")
+                if RUN:
+                    os.system(f"python3 main.py -dl {dataLocation}/{file} -ka -k {k} -ld -l {l} -el ../results/both/")
 
         for (dirpath, dirnames, filenames) in os.walk("../results/both/"):
             for file in filenames:
-                if "l"+str(l) in file:
+                if "l"+str(l) in file and "k"+str(k) in file:
                     originalFile = file.split("_")[-3]+"_cohort_rows.csv"
                     with open(f"../results/both/{file}", "r") as f:
                         content = f.readlines()
