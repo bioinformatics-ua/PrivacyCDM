@@ -29,13 +29,46 @@ class Ldiversity(PluginCore):
 
         equivalenceClasses = getEquivalenceClasses(dataToGroup)
         
+        return self.__removeEntries(equivalenceClasses, dataToGroup, data, l)
+        
+    def __removeEntries(self, equivalenceClasses: dict, dataToGroup: pd.DataFrame, data: pd.DataFrame, l:int) -> pd.DataFrame:
         indexToRemove = list()
+        indexToAnalise = list()
+        dictIndexToAnalise = dict()
         index = 0
         for entry in dataToGroup.values.tolist():
             entry = str(entry)
-            if equivalenceClasses[entry] < l:
+            #If no l entries for the equivalence class, so no l different attributes 
+            if equivalenceClasses[entry] < l: 
                 indexToRemove.append(index)
+            else:
+                if entry not in dictIndexToAnalise:
+                    dictIndexToAnalise[entry] = []
+                dictIndexToAnalise[entry].append(index)
+                indexToAnalise.append(index)
             index += 1
+
+        counterSA = dict()
+        removeSA = dict()
+        for index, row in data.iterrows():
+            if index in indexToAnalise and index not in indexToRemove:
+                for entry in dictIndexToAnalise:
+                    if index in dictIndexToAnalise[entry]: #encotnrei a entrada certa par ao index
+                        if len(dictIndexToAnalise[entry]) < l: #nem vale a pena continuar
+                            for x in dictIndexToAnalise[entry]:
+                                indexToRemove.append(x)
+                        else:
+                            if entry not in counterSA:
+                                counterSA[entry] = set()
+                            counterSA[entry].add(str(row.tolist()))
+                            if entry not in removeSA:
+                                removeSA[entry] = []
+                            removeSA[entry].append(index)
+
+        for entry in counterSA:
+            if len(counterSA[entry]) < l: #marcar para remover
+                for x in removeSA[entry]:
+                    indexToRemove.append(x)
 
         for index, row in data.iterrows():
             if index in indexToRemove:
